@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 
-from scripts import createXMLFile, convert_xml_to_excel
+from scripts import createXMLFile, compare_language_excel
 
 
 class ExcelToXmlConverterApp:
@@ -137,7 +137,7 @@ class ExcelToXmlConverterApp:
         output_file_path = os.path.join(output_folder, output_file_name)
 
         try:
-            convert_xml_to_excel(input_file, output_file_path)  # Your conversion function
+            compare_language_excel(input_file, output_file_path)  # Your conversion function
             messagebox.showinfo("Success", "Conversion successful!")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")

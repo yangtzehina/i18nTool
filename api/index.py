@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, send_file, url_for, flash
 import os
-from scripts import createXMLFile, convert_xml_to_excel
+from scripts import createXMLFile, compare_language_excel
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -35,7 +35,7 @@ def convert_excel_to_xml():
 from werkzeug.utils import secure_filename
 
 @app.route('/convert_xml_to_excel', methods=['GET', 'POST'])
-def convert_xml_to_excel():
+def compare_language_excel():
     if request.method == 'POST':
         # Check if the post request has the file part
         if 'input_file' not in request.files:
@@ -58,7 +58,7 @@ def convert_xml_to_excel():
 
         # Process conversion
         try:
-            convert_xml_to_excel(file_path, os.path.join(output_folder, output_file_name))
+            compare_language_excel(file_path, os.path.join(output_folder, output_file_name))
             flash('Conversion successful!', 'success')
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')

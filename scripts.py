@@ -9,14 +9,11 @@ class XMLFunctions :
     # child_data : Type :  TreeNode
     @staticmethod
     def create_Item(child_data) :
-        root_item = etree.Element("Item")
-        element_id = etree.SubElement(root_item, "ID")
+        root_item = etree.Element("entry")
+        element_id = etree.SubElement(root_item, "KEY")
         element_id.text = str(child_data.data.id)
-        element_name = etree.SubElement(root_item, "Name")
+        element_name = etree.SubElement(root_item, "VALUE1")
         element_name.text = child_data.data.name
-        element_description = etree.SubElement(root_item, "Description")
-        element_description.text = child_data.data.description
-        element_children = etree.SubElement(root_item, "Children")
         return root_item
     
     @staticmethod
@@ -211,58 +208,128 @@ def createXMLFile(input_path, output_path, name, editionVersion, year, month, da
 
 from openpyxl import Workbook
 import lxml.etree as etree
+import pandas as pd
 
+def return_row(item) :
+    
+    id_value = item.find("KEY").text if item.find("KEY") is not None else ""
 
-def return_row(item, level) :
-    if (len(item.find("ID").text) == 8) or level == 3 :
-        id_value = item.find("ID").text
-    elif level == 1:
-        if len(item.find("ID").text) == 2 :
-            id_value = "{}|00|00".format(item.find("ID").text)
-        elif len(item.find("ID").text) == 1 :
-            id_value = "0{}|00|00".format(item.find("ID").text)
-    elif level == 2 or len(item.find("ID").text) == 5:
-        id_value = "{}|00".format(item.find("ID").text)
-
-    id_value = item.find("ID").text if item.find("ID") is not None else ""
-
-    name_value = item.find("Name").text if item.find("Name") is not None else ""
-
-    description = item.find("Description").text
+    name_value = item.find("VALUE1").text if item.find("VALUE1") is not None else ""
 
     try :
-        return [id_value, name_value, description, level]
+        return [id_value, name_value]
     except :
         return []
 def convert_xml_to_excel(input_file, output_file) :
     # XML File
     tree = etree.parse(input_file)
     
-    xpath_expression = "/BuildingInformation/Classification/System/Items/Item"
+    xpath_expression = "/root/data/LanguageStringConvertor/entry"
     items = tree.xpath(xpath_expression)
 
     # Create new Excel File
     wb = Workbook()
     ws = wb.active
-    ws.append(["ID", "Name", "Description", "Level"])
+    ws.append(["KEY", "VALUE1"])
 
     for item in items :
-        ws.append(return_row(item, 1))
-        children = item.find("Children")
-        if children is not None:
-            for item_child_1 in children.findall("Item") :
-                ws.append(return_row(item_child_1, 2))
-                children_1 = item_child_1.find("Children")
-                if children_1 is not None:
-                    for item_child_2 in children_1.findall("Item") :
-                        ws.append(return_row(item_child_2, 3))
-                        children_2 = item_child_2.find("Children")
-                        if children_2 is not None:
-                            for item_child_3 in children_2.findall("Item") :
-                                ws.append(return_row(item_child_3, 4))
-                                children_3 = item_child_3.find("Children")
-                                if children_3 is not None:
-                                    for item_child_4 in children_3.findall("Item") :
-                                        ws.append(return_row(item_child_4, 5))
-
+        ws.append(return_row(item))
     wb.save(output_file)
+
+def compare_language_excel(input_file, dist_file):
+    """
+    比较两个Excel表格的KEY和VALUE1字段，直接更新dist_file文件，
+    并用颜色标记新增和修改的内容。
+    
+    Args:
+        input_file: 源文件路径
+        dist_file: 目标文件路径（将被直接修改）
+    """
+    # 获取文件
+    source = pd.read_excel(input_file)
+    dist = pd.read_excel(dist_file)
+    
+    # 确保两个表格都有KEY和VALUE1列
+    if 'KEY' not in source.columns or 'VALUE1' not in source.columns:
+        raise ValueError("源文件缺少KEY或VALUE1列")
+    if 'KEY' not in dist.columns or 'VALUE1' not in dist.columns:
+        raise ValueError("目标文件缺少KEY或VALUE1列")
+    
+    # 创建源表的键值对字典
+    source_dict = dict(zip(source['KEY'], source['VALUE1']))
+    
+    # 得到目标表原始列
+    original_columns = dist.columns.tolist()
+    
+    # 创建结果表的副本
+    result = dist.copy()
+    
+    # 记录需要标记的单元格
+    cells_to_highlight = []  # [(行索引, "新增"或"修改")]
+    
+    # 检查修改的内容
+    for idx, row in result.iterrows():
+        key = row['KEY']
+        if key in source_dict and row['VALUE1'] != source_dict[key]:
+            # 值不同 - 更新值
+            result.at[idx, 'VALUE1'] = source_dict[key]
+            cells_to_highlight.append((idx, "修改"))
+    
+    # 检查新增的内容
+    existing_keys = set(result['KEY'])
+    new_rows = []
+    for key, value in source_dict.items():
+        if key not in existing_keys:
+            # 准备新行数据
+            new_row = {col: None for col in original_columns}  # 先用None填充所有列
+            new_row['KEY'] = key
+            new_row['VALUE1'] = value
+            new_rows.append(new_row)
+    
+    # 添加新行到结果
+    if new_rows:
+        new_df = pd.DataFrame(new_rows)
+        result = pd.concat([result, new_df], ignore_index=True)
+        # 记录新增行的索引
+        for i in range(len(new_rows)):
+            cells_to_highlight.append((len(dist) + i, "新增"))
+    
+    # 直接更新目标文件
+    from openpyxl.styles import PatternFill
+    
+    # 导出为Excel (覆盖原文件)
+    result.to_excel(dist_file, index=False)
+    
+    # 打开并设置颜色
+    wb = load_workbook(dist_file)
+    ws = wb.active
+    
+    # 定义填充颜色
+    new_fill = PatternFill(start_color="92D050", end_color="92D050", fill_type="solid")  # 绿色
+    changed_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")  # 黄色
+    
+    # 为标记的单元格设置颜色
+    for idx, status in cells_to_highlight:
+        # 调整行索引：Excel行从1开始，第1行是标题，所以+2
+        excel_row = idx + 2
+        
+        # 为整行设置颜色
+        for col in range(1, ws.max_column + 1):
+            cell = ws.cell(row=excel_row, column=col)
+            if status == "新增":
+                cell.fill = new_fill
+            elif status == "修改":
+                cell.fill = changed_fill
+    
+    # 保存结果 (覆盖原文件)
+    wb.save(dist_file)
+    print(f"文件已更新: {dist_file}")
+    
+    # 返回修改的统计信息
+    modifications = sum(1 for _, status in cells_to_highlight if status == "修改")
+    new_entries = sum(1 for _, status in cells_to_highlight if status == "新增")
+    
+    print(f"已修改 {modifications} 个条目，新增 {new_entries} 个条目")
+    
+    return result
+

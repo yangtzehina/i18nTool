@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 
-from scripts import createXMLFile, convert_xml_to_excel
+from scripts import createXMLFile, compare_language_excel
 
 
 class ExcelToXmlConverterApp:
@@ -25,6 +25,9 @@ class ExcelToXmlConverterApp:
         self.button1.pack(pady=(50, 10))
 
         self.button2 = ttk.Button(root, text="Convert XML to Excel", command=self.convert_xml_to_excel_interface)
+        self.button2.pack(pady=10)
+
+        self.button2 = ttk.Button(root, text="比对多语言表格", command=self.compare_excel_to_excel_interface)
         self.button2.pack(pady=10)
 
     def convert_excel_to_xml_interface(self):
@@ -81,6 +84,37 @@ class ExcelToXmlConverterApp:
 
         setattr(self, f"{attribute_name}_entry", entry)
 
+    def compare_excel_to_excel_interface(self):
+        self.clear_root()
+
+        # 导入源目标表格
+        self.input_file_label = ttk.Label(self.root, text="翻译源目标:")
+        self.input_file_label.pack(pady=(10, 5))
+
+        self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
+        self.input_file_entry.pack(pady=5)
+
+        self.choose_file_button = ttk.Button(self.root, text="Choose File", command=lambda: self.choose_file("excel"))
+        self.choose_file_button.pack(pady=(5, 10))
+
+        # 导入翻译母本
+        self.output_folder_label = ttk.Label(self.root, text="翻译母本:")
+        self.output_folder_label.pack(pady=(10, 5))
+
+        self.output_folder_entry = ttk.Entry(self.root, state="disabled", width=40)
+        self.output_folder_entry.pack(pady=5)
+
+        self.choose_folder_button = ttk.Button(self.root, text="Choose File", command=lambda: self.choose_file_dist("excel"))
+        self.choose_folder_button.pack(pady=(5, 10))
+
+        # Button to run conversion
+        self.run_button = ttk.Button(self.root, text="执行对比", command=self.run_compare_conversion)
+        self.run_button.pack(pady=(20, 10))
+
+        # Return button
+        self.return_button = ttk.Button(self.root, text="Return to Menu", command=self.return_to_menu)
+        self.return_button.pack(pady=(20, 10))
+
     def convert_xml_to_excel_interface(self):
         self.clear_root()
 
@@ -125,6 +159,14 @@ class ExcelToXmlConverterApp:
             self.input_file_entry.delete(0, tk.END)
             self.input_file_entry.insert(0, file_path)
             self.input_file_entry.config(state="disabled")
+
+    def choose_file_dist(self, fileType):
+        file_path_dist = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls") if fileType == "excel" else ("XML files", "*.xml")])
+        if file_path_dist:
+            self.output_folder_entry.config(state="normal")
+            self.output_folder_entry.delete(0, tk.END)
+            self.output_folder_entry.insert(0, file_path_dist)
+            self.output_folder_entry.config(state="disabled")
 
     def choose_folder(self):
         folder_path = filedialog.askdirectory()
@@ -178,6 +220,20 @@ class ExcelToXmlConverterApp:
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
+    def run_compare_conversion(self):
+        input_file = self.input_file_entry.get()
+        dist_file = self.output_folder_entry.get()
+
+        if not input_file or not dist_file:
+            messagebox.showerror("Error", "路径不能为空.")
+            return
+        
+        try:
+            compare_language_excel(input_file, dist_file)  # Your conversion function
+            messagebox.showinfo("Success", "对比成功!")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
     def run_xml_to_excel_conversion(self):
         input_file = self.input_file_entry.get()
         output_folder = self.output_folder_entry.get()
@@ -196,7 +252,7 @@ class ExcelToXmlConverterApp:
         output_file_path = os.path.join(output_folder, output_file_name)
 
         try:
-            convert_xml_to_excel(input_file, output_file_path)  # Your conversion function
+            compare_language_excel(input_file, output_file_path)  # Your conversion function
             messagebox.showinfo("Success", "Conversion successful!")
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
