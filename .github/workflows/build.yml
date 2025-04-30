@@ -25,9 +25,16 @@ jobs:
         pip install pyinstaller
         pip install -r requirements.txt
         
+    - name: Check directory structure
+      run: |
+        dir
+        echo "Creating templates and static directories if they don't exist"
+        if not exist templates mkdir templates
+        if not exist static mkdir static
+        
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --windowed --add-data "templates;templates" --add-data "static;static" --icon=app.ico --name EXCEL2XML template.py
+        pyinstaller --onefile --windowed --name EXCEL2XML template.py
     
     - name: Create release ZIP
       run: |
