@@ -30,7 +30,7 @@ jobs:
         pyinstaller --onefile --name EXCEL2XML scripts.py
         
     - name: Upload EXE artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: EXCEL2XML
         path: dist/EXCEL2XML.exe
