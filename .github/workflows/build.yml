@@ -42,7 +42,7 @@ jobs:
       run: |
         dir
         dir dist
-        Compress-Archive -Path "dist\EXCEL2XML.exe" -DestinationPath "EXCEL2XML.zip"
+        Compress-Archive -Path "dist\EXCEL2XML" -DestinationPath "EXCEL2XML.zip"
     
     - name: Extract version from tag
       id: get_version
