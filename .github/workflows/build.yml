@@ -27,10 +27,17 @@ jobs:
         
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --name EXCEL2XML scripts.py
-        
-    - name: Upload EXE artifact
-      uses: actions/upload-artifact@v4
+        pyinstaller --onefile --windowed --add-data "templates;templates" --add-data "static;static" --icon=app.ico --name EXCEL2XML template.py
+    
+    - name: Create release ZIP
+      run: |
+        Compress-Archive -Path dist/EXCEL2XML.exe -DestinationPath EXCEL2XML.zip
+    
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: EXCEL2XML
-        path: dist/EXCEL2XML.exe
+        files: EXCEL2XML.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
