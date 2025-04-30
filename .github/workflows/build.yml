@@ -29,8 +29,8 @@ jobs:
       run: |
         dir
         echo "Creating templates and static directories if they don't exist"
-        if not exist templates mkdir templates
-        if not exist static mkdir static
+        if (-not (Test-Path -Path "templates")) { New-Item -Path "templates" -ItemType Directory }
+        if (-not (Test-Path -Path "static")) { New-Item -Path "static" -ItemType Directory }
         
     - name: Build with PyInstaller
       run: |
