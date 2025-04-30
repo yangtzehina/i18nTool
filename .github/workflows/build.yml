@@ -2,7 +2,6 @@ name: Build and Release
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'  # 只在v开头的标签推送时触发
   pull_request:
