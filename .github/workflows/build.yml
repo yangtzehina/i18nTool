@@ -36,7 +36,7 @@ jobs:
         
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --windowed --name EXCEL2XML template.py
+        pyinstaller --windowed --name EXCEL2XML template.py
     
     - name: Create release ZIP
       run: |
