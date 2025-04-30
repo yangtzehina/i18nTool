@@ -70,40 +70,6 @@ class XMLFunctions :
             with open(xml_file, 'w', encoding='utf-8') as file:
                 file.write(xml_content)
 
-    @staticmethod
-    def createNewXMLFile(root_TreeNode, elements, output_path, name, editionVersion, year, month, day, source):
-        root = etree.Element("BuildingInformation")
-        root_xml = etree.SubElement(root, "Classification")
-        system = etree.SubElement(root_xml, "System")
-        
-        name_element = etree.SubElement(system, "Name")
-        name_element.text = name
-
-        editionVersion_element = etree.SubElement(system, "EditionVersion")
-        editionVersion_element.text = editionVersion
-
-        editionDate = etree.SubElement(system, "EditionDate")
-        
-        year_element = etree.SubElement(editionDate, "Year")
-        year_element.text = year
-
-        month_element = etree.SubElement(editionDate, "Month")
-        month_element.text = month
-
-        day_element = etree.SubElement(editionDate, "Day")
-        day_element.text = day
-
-        description = etree.SubElement(system, "Description")
-
-        source_element = etree.SubElement(system, "Source")
-        source_element.text = source
-
-        items = etree.SubElement(system, "Items")
-
-        XMLFunctions.createXMLTree(root_TreeNode, items, elements)
-
-        XMLFunctions.SaveXMLFile(root, output_path)
-
 def excelSheet_modulation(sheet) :
 
      # Convert the generator to a list for reversing

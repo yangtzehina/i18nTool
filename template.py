@@ -8,7 +8,7 @@ from scripts import createXMLFile, compare_language_excel
 class ExcelToXmlConverterApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Excel2XML")
+        self.root.title("游戏多语言工具")
 
         self.root.geometry("600x800")
 
@@ -20,60 +20,15 @@ class ExcelToXmlConverterApp:
         self.root.option_add("*TLabel*background", "#FDEBD0")    # Cream
         self.root.option_add("*TLabel*foreground", "#2C3E50")    # Dark Blue
 
-        # Main menu buttons
-        self.button1 = ttk.Button(root, text="Convert Excel to XML", command=self.convert_excel_to_xml_interface)
+        self.button1 = ttk.Button(root, text="转换XML到Excel", command=self.convert_xml_to_excel_interface)
         self.button1.pack(pady=(50, 10))
 
-        self.button2 = ttk.Button(root, text="Convert XML to Excel", command=self.convert_xml_to_excel_interface)
+        self.button2 = ttk.Button(root, text="多语言表格比对 Excel2Excel", command=self.compare_excel_to_excel_interface)
         self.button2.pack(pady=10)
 
-        self.button2 = ttk.Button(root, text="比对多语言表格", command=self.compare_excel_to_excel_interface)
-        self.button2.pack(pady=10)
+        self.button3 = ttk.Button(root, text="多语言表格比对 Xml2Excel", command=self.compare_excel_to_excel_interface)
+        self.button3.pack(pady=10)
 
-    def convert_excel_to_xml_interface(self):
-        self.clear_root()
-
-        # Input fields for additional metadata
-        self.create_label_and_entry("Name:", "name")
-        self.create_label_and_entry("Edition Version: (example: v2.0)", "edition_version")
-        self.create_label_and_entry("Year: (example: 2019)", "year")
-        self.create_label_and_entry("Month: (example: 3)", "month")
-        self.create_label_and_entry("Day: (example: 15)", "day")
-        self.create_label_and_entry("Source: (example: www.graphisoft.com)", "source")
-
-        # Input Excel file
-        self.input_file_label = ttk.Label(self.root, text="Input Excel File:")
-        self.input_file_label.pack(pady=(10, 5))
-
-        self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
-        self.input_file_entry.pack(pady=5)
-
-        self.choose_file_button = ttk.Button(self.root, text="Choose File", command=lambda: self.choose_file("excel"))
-        self.choose_file_button.pack(pady=(5, 10))
-
-        # Output folder and XML file
-        self.output_folder_label = ttk.Label(self.root, text="Output Folder:")
-        self.output_folder_label.pack(pady=(10, 5))
-
-        self.output_folder_entry = ttk.Entry(self.root, state="disabled", width=40)
-        self.output_folder_entry.pack(pady=5)
-
-        self.choose_folder_button = ttk.Button(self.root, text="Choose Folder", command=self.choose_folder)
-        self.choose_folder_button.pack(pady=(5, 10))
-
-        self.output_file_label = ttk.Label(self.root, text="XML File Name:")
-        self.output_file_label.pack(pady=(10, 5))
-
-        self.output_file_entry = ttk.Entry(self.root, width=40)
-        self.output_file_entry.pack(pady=5)
-
-        # Button to run conversion
-        self.run_button = ttk.Button(self.root, text="Run Conversion", command=self.run_excel_to_xml_conversion)
-        self.run_button.pack(pady=(20, 10))
-
-        # Return button
-        self.return_button = ttk.Button(self.root, text="Return to Menu", command=self.return_to_menu)
-        self.return_button.pack(pady=(20, 10))
 
     def create_label_and_entry(self, label_text, attribute_name):
         label = ttk.Label(self.root, text=label_text)
