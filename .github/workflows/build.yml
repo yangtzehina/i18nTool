@@ -37,10 +37,13 @@ jobs:
     - name: Build with PyInstaller
       run: |
         pyinstaller --windowed --name EXCEL2XML template.py
-    
+        dir dist
+        
     - name: Create release ZIP
       run: |
-        Compress-Archive -Path dist/EXCEL2XML.exe -DestinationPath EXCEL2XML.zip
+        dir
+        dir dist
+        Compress-Archive -Path "dist\EXCEL2XML.exe" -DestinationPath "EXCEL2XML.zip"
     
     - name: Extract version from tag
       id: get_version
