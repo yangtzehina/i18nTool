@@ -225,11 +225,13 @@ class ExcelProcessor:
             print(f"Excel对比失败: {str(e)}")
             raise
 
-
 # 公共API函数，供其他模块调用
-def convert_xml_to_excel(input_file, output_file):
-    """将XML文件转换为Excel文件"""
-    return XMLProcessor.xml_to_excel(input_file, output_file)
+def convert_xml_to_excel(input_file, dist_file):
+    """比较和更新xml2Excel文件"""
+    stats = ExcelProcessor.compare_excel(input_file, dist_file)
+    print(f"文件已更新: {dist_file}")
+    print(f"已修改 {stats['modifications']} 个条目，新增 {stats['new_entries']} 个条目")
+    return stats
 
 def convert_excel_to_xml(input_file, output_file):
     """将Excel文件转换为XML文件"""

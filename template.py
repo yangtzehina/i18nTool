@@ -38,37 +38,31 @@ class ExcelToXmlConverterApp:
         self.button3.pack(pady=10)
     
     def convert_xml_to_excel_interface(self):
-        """XML转Excel界面"""
+        """Excel文件对比界面"""
         self.clear_root()
 
-        # 输入XML文件
-        self.input_file_label = ttk.Label(self.root, text="输入XML文件:")
+        # 导入源目标表格
+        self.input_file_label = ttk.Label(self.root, text="翻译源目标:(Xml)")
         self.input_file_label.pack(pady=(10, 5))
 
         self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
         self.input_file_entry.pack(pady=5)
 
-        self.choose_file_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file("xml"))
+        self.choose_file_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file())
         self.choose_file_button.pack(pady=(5, 10))
 
-        # 输出文件夹和Excel文件
-        self.output_folder_label = ttk.Label(self.root, text="输出文件夹:")
+        # 导入翻译母本
+        self.output_folder_label = ttk.Label(self.root, text="翻译母本:")
         self.output_folder_label.pack(pady=(10, 5))
 
         self.output_folder_entry = ttk.Entry(self.root, state="disabled", width=40)
         self.output_folder_entry.pack(pady=5)
 
-        self.choose_folder_button = ttk.Button(self.root, text="选择文件夹", command=self.choose_folder)
+        self.choose_folder_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file_dist("excel"))
         self.choose_folder_button.pack(pady=(5, 10))
 
-        self.output_file_label = ttk.Label(self.root, text="Excel文件名:")
-        self.output_file_label.pack(pady=(10, 5))
-
-        self.output_file_entry = ttk.Entry(self.root, width=40)
-        self.output_file_entry.pack(pady=5)
-
-        # 运行转换按钮
-        self.run_button = ttk.Button(self.root, text="开始转换", command=self.run_xml_to_excel_conversion)
+        # 执行对比按钮
+        self.run_button = ttk.Button(self.root, text="执行对比", command=self.run_compare_conversion)
         self.run_button.pack(pady=(20, 10))
 
         # 返回按钮
@@ -112,7 +106,7 @@ class ExcelToXmlConverterApp:
         self.clear_root()
 
         # 导入源目标表格
-        self.input_file_label = ttk.Label(self.root, text="翻译源目标:")
+        self.input_file_label = ttk.Label(self.root, text="翻译源目标:(Excel)")
         self.input_file_label.pack(pady=(10, 5))
 
         self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
@@ -197,27 +191,20 @@ class ExcelToXmlConverterApp:
             messagebox.showerror("错误", f"发生错误: {str(e)}")
 
     def run_xml_to_excel_conversion(self):
-        """执行XML转Excel转换"""
+        """执行xml2Excel对比和更新"""
         input_file = self.input_file_entry.get()
-        output_folder = self.output_folder_entry.get()
-        output_file_name = self.output_file_entry.get()
+        dist_file = self.output_folder_entry.get()
 
-        if not input_file or not output_folder or not output_file_name:
-            messagebox.showerror("错误", "请选择输入文件、输出文件夹并提供Excel文件名。")
+        if not input_file or not dist_file:
+            messagebox.showerror("错误", "路径不能为空。")
             return
-
-        # 处理文件扩展名
-        index = output_file_name.find('.')
-        if index != -1:
-            output_file_name = output_file_name[:index]
-        output_file_name += '.xlsx'
-        output_file_path = os.path.join(output_folder, output_file_name)
-
+        
         try:
-            convert_xml_to_excel(input_file, output_file_path)
-            messagebox.showinfo("成功", "转换成功！")
+            stats = convert_xml_to_excel(input_file, dist_file)
+            messagebox.showinfo("成功", f"对比成功！已修改 {stats['modifications']} 个条目，新增 {stats['new_entries']} 个条目")
         except Exception as e:
             messagebox.showerror("错误", f"发生错误: {str(e)}")
+
 
     def clear_root(self):
         """清空窗口内容"""
