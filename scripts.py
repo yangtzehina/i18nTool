@@ -237,7 +237,7 @@ class ExcelProcessor:
             tree = etree.parse(input_file)
             
             # 查找所有entry元素
-            xpath_expression = "/resources"
+            xpath_expression = "//string"
             items = tree.xpath(xpath_expression)
 
             # 获取文件
@@ -251,15 +251,22 @@ class ExcelProcessor:
             
               # 提取XML数据并添加到字典
             for string in items:
-                # 获取name属性作为KEY
-                name = string.get("name", "")
+                # 构建完整的属性字符串作为KEY
+                attributes = []
+                for attr_name, attr_value in string.attrib.items():
+                    attributes.append(f'{attr_name}="{attr_value}"')
+    
+                key = " ".join(attributes)  # 组合所有属性为一个完整的字符串
                 # 获取标签内容作为VALUE
                 value = string.text if string.text else ""
             
                 # 添加到字典
-                if name:  # 只有当name属性存在时才添加
-                    source_dict[name] = value
+                if key:  # 只有当name属性存在时才添加
+                    source_dict[key] = value
 
+            # 打印源字典内容
+            print("Source dictionary contents:")
+            print(source_dict)
             # 得到目标表原始列
             original_columns = dist.columns.tolist()
             

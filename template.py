@@ -48,7 +48,7 @@ class ExcelToXmlConverterApp:
         self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
         self.input_file_entry.pack(pady=5)
 
-        self.choose_file_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file())
+        self.choose_file_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file("xml"))
         self.choose_file_button.pack(pady=(5, 10))
 
         # 导入翻译母本
