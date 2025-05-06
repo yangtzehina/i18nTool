@@ -228,23 +228,38 @@ class ExcelProcessor:
     @staticmethod
     def compare_xml_excel(input_file, dist_file):
         """
-        比较两个Excel表格的KEY和VALUE1字段，直接更新dist_file文件，
+        比较xml Excel相同的key的value值，直接更新dist_file文件，
         并用颜色标记新增和修改的内容。
         """
         try:
+
+            # 解析XML文件
+            tree = etree.parse(input_file)
+            
+            # 查找所有entry元素
+            xpath_expression = "/resources"
+            items = tree.xpath(xpath_expression)
+
             # 获取文件
-            source = pd.read_excel(input_file)
             dist = pd.read_excel(dist_file)
             
-            # 确保两个表格都有KEY和VALUE1列
-            if 'KEY' not in source.columns or 'VALUE1' not in source.columns:
-                raise ValueError("源文件缺少KEY或VALUE1列")
             if 'KEY' not in dist.columns or 'VALUE1' not in dist.columns:
                 raise ValueError("目标文件缺少KEY或VALUE1列")
             
             # 创建源表的键值对字典
-            source_dict = dict(zip(source['KEY'], source['VALUE1']))
+            source_dict = {}
             
+              # 提取XML数据并添加到字典
+            for string in items:
+                # 获取name属性作为KEY
+                name = string.get("name", "")
+                # 获取标签内容作为VALUE
+                value = string.text if string.text else ""
+            
+                # 添加到字典
+                if name:  # 只有当name属性存在时才添加
+                    source_dict[name] = value
+
             # 得到目标表原始列
             original_columns = dist.columns.tolist()
             
