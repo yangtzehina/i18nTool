@@ -34,7 +34,7 @@ class ExcelToXmlConverterApp:
         self.button2 = ttk.Button(self.root, text="多语言表格比对 Excel2Excel", command=self.compare_excel_to_excel_interface)
         self.button2.pack(pady=10)
 
-        self.button3 = ttk.Button(self.root, text="Excel转XML", command=self.excel_to_xml_interface)
+        self.button3 = ttk.Button(self.root, text="多语言表格导出 Excel转XML", command=self.excel_to_xml_interface)
         self.button3.pack(pady=10)
     
     def convert_xml_to_excel_interface(self):
@@ -98,12 +98,6 @@ class ExcelToXmlConverterApp:
 
         self.choose_folder_button = ttk.Button(self.root, text="选择文件夹", command=self.choose_folder)
         self.choose_folder_button.pack(pady=(5, 10))
-
-        self.output_file_label = ttk.Label(self.root, text="XML文件名:")
-        self.output_file_label.pack(pady=(10, 5))
-
-        self.output_file_entry = ttk.Entry(self.root, width=40)
-        self.output_file_entry.pack(pady=5)
 
         # 运行转换按钮
         self.run_button = ttk.Button(self.root, text="开始转换", command=self.run_excel_to_xml_conversion)
@@ -176,21 +170,13 @@ class ExcelToXmlConverterApp:
         """执行Excel转XML转换"""
         input_file = self.input_file_entry.get()
         output_folder = self.output_folder_entry.get()
-        output_file_name = self.output_file_entry.get()
 
-        if not input_file or not output_folder or not output_file_name:
+        if not input_file or not output_folder:
             messagebox.showerror("错误", "请选择输入文件、输出文件夹并提供XML文件名。")
             return
 
-        # 处理文件扩展名
-        index = output_file_name.find('.')
-        if index != -1:
-            output_file_name = output_file_name[:index]
-        output_file_name += '.xml'
-        output_file_path = os.path.join(output_folder, output_file_name)
-
         try:
-            convert_excel_to_xml(input_file, output_file_path)
+            convert_excel_to_xml(input_file, output_folder)
             messagebox.showinfo("成功", "转换成功！")
         except Exception as e:
             messagebox.showerror("错误", f"发生错误: {str(e)}")
