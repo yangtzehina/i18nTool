@@ -62,7 +62,7 @@ class ExcelToXmlConverterApp:
         self.choose_folder_button.pack(pady=(5, 10))
 
         # 执行对比按钮
-        self.run_button = ttk.Button(self.root, text="执行对比", command=self.run_compare_conversion)
+        self.run_button = ttk.Button(self.root, text="执行对比", command=self.run_xml_to_excel_conversion)
         self.run_button.pack(pady=(20, 10))
 
         # 返回按钮
