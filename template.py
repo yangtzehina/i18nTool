@@ -28,7 +28,7 @@ class ExcelToXmlConverterApp:
     
     def create_main_menu(self):
         """创建主菜单界面"""
-        self.button1 = ttk.Button(self.root, text="转换XML到Excel", command=self.convert_xml_to_excel_interface)
+        self.button1 = ttk.Button(self.root, text="多语言表格比对 xml2Excel", command=self.convert_xml_to_excel_interface)
         self.button1.pack(pady=(50, 10))
 
         self.button2 = ttk.Button(self.root, text="多语言表格比对 Excel2Excel", command=self.compare_excel_to_excel_interface)
