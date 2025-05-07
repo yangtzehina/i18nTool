@@ -1,4 +1,4 @@
-# MutilLanguageTool
+# FairyGUI i18nTool
 
 Fork From https://github.com/KhaledKammoun/EXCEL2XML
 
