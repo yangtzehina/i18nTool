@@ -38,17 +38,18 @@ jobs:
         pyinstaller --windowed --name ${{ github.event.repository.name }} template.py
         dir dist
         
-    - name: Create release ZIP
-      run: |
-        dir
-        dir dist
-        Compress-Archive -Path "dist\${{ github.event.repository.name }}" -DestinationPath "${{ github.event.repository.name }}_${{ steps.get_version.outputs.VERSION }}.zip"
-    
     - name: Extract version from tag
       id: get_version
       if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       shell: bash
+
+    - name: Create release ZIP
+      if: startsWith(github.ref, 'refs/tags/') # Also make this step conditional
+      run: |
+        dir
+        dir dist
+        Compress-Archive -Path "dist\${{ github.event.repository.name }}" -DestinationPath "${{ github.event.repository.name }}_${{ steps.get_version.outputs.VERSION }}.zip"
     
     - name: Create GitHub Release
       id: create_release
