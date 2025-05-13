@@ -35,14 +35,14 @@ jobs:
         
     - name: Build with PyInstaller
       run: |
-        pyinstaller --windowed --name EXCEL2XML template.py
+        pyinstaller --windowed --name ${{ github.event.repository.name }} template.py
         dir dist
         
     - name: Create release ZIP
       run: |
         dir
         dir dist
-        Compress-Archive -Path "dist\EXCEL2XML" -DestinationPath "EXCEL2XML.zip"
+        Compress-Archive -Path "dist\${{ github.event.repository.name }}" -DestinationPath "${{ github.event.repository.name }}.zip"
     
     - name: Extract version from tag
       id: get_version
@@ -57,7 +57,7 @@ jobs:
       with:
         name: Release ${{ steps.get_version.outputs.VERSION }}
         body: |
-          ## EXCEL2XML 发布版本 ${{ steps.get_version.outputs.VERSION }}
+          ## ${{ github.event.repository.name }} 发布版本 ${{ steps.get_version.outputs.VERSION }}
           
           ### 功能
           - XML转Excel：支持从XML导出为Excel格式
@@ -66,8 +66,8 @@ jobs:
           
           ### 安装和使用
           1. 下载并解压ZIP文件
-          2. 运行EXCEL2XML.exe
+          2. 运行 ${{ github.event.repository.name }}.exe
           3. 按照界面提示操作
-        files: EXCEL2XML.zip
+        files: ${{ github.event.repository.name }}_${{ steps.get_version.outputs.VERSION }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
