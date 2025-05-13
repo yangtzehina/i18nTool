@@ -42,7 +42,7 @@ jobs:
       run: |
         dir
         dir dist
-        Compress-Archive -Path "dist\${{ github.event.repository.name }}" -DestinationPath "${{ github.event.repository.name }}.zip"
+        Compress-Archive -Path "dist\${{ github.event.repository.name }}" -DestinationPath "${{ github.event.repository.name }}_${{ steps.get_version.outputs.VERSION }}.zip"
     
     - name: Extract version from tag
       id: get_version
