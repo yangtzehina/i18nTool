@@ -3,6 +3,7 @@ import lxml.etree as etree
 import pandas as pd
 from openpyxl.styles import PatternFill
 import os
+from io import BytesIO  # Add this import
 
 """
 核心功能模块: 包含所有XML和Excel处理功能
@@ -232,14 +233,24 @@ class ExcelProcessor:
         并用颜色标记新增和修改的内容。
         """
         try:
+            # Read the XML file content as a string
+            with open(input_file, 'r', encoding='utf-8') as f:
+                xml_content_str = f.read()
+            
+            # Remove the ETX character (ASCII 03)
+            cleaned_xml_content_str = xml_content_str.replace('\x03', '')
+            
+            # Convert the cleaned string to bytes and use BytesIO to make it file-like
+            cleaned_xml_content_bytes = cleaned_xml_content_str.encode('utf-8')
+            xml_file_like_object = BytesIO(cleaned_xml_content_bytes)
 
-            # 解析XML文件
-            tree = etree.parse(input_file)
+            # 解析XML文件 from the cleaned, file-like object
+            tree = etree.parse(xml_file_like_object)
             
             # 查找所有entry元素
             xpath_expression = "//string"
             items = tree.xpath(xpath_expression)
-
+            
             # 获取文件
             dist = pd.read_excel(dist_file)
             
@@ -249,7 +260,7 @@ class ExcelProcessor:
             # 创建源表的键值对字典
             source_dict = {}
             
-              # 提取XML数据并添加到字典
+            # 提取XML数据并添加到字典
             for string in items:
                 # 构建完整的属性字符串作为KEY
                 attributes = []
