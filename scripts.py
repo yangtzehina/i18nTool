@@ -44,7 +44,7 @@ class XMLProcessor:
             df = pd.read_excel(input_path)
             # 获取列名作为语言标识
             languages = df.columns[1:]  # 跳过第一列（键名列）
-            key_column = df.iloc[:, 0]  # 获取第一列作为键名
+            key_column = df.iloc[:, 1]  # 获取第一列作为键名
             
             # 为每种语言生成对应的XML文件
             for col_idx, language in enumerate(languages, start=1):
