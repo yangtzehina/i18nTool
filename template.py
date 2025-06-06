@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 
-from scripts import convert_xml_to_excel, convert_excel_to_xml, compare_language_excel
+from scripts import convert_xml_to_excel, convert_excel_to_xml, convert_excel_to_xml_game,compare_language_excel
 
 class ExcelToXmlConverterApp:
     def __init__(self, root):
@@ -34,7 +34,10 @@ class ExcelToXmlConverterApp:
         self.button2 = ttk.Button(self.root, text="多语言表格比对 Excel2Excel", command=self.compare_excel_to_excel_interface)
         self.button2.pack(pady=10)
 
-        self.button3 = ttk.Button(self.root, text="多语言表格导出 Excel转XML", command=self.excel_to_xml_interface)
+        self.button3 = ttk.Button(self.root, text="(UI多语言)多语言表格导出 Excel转XML", command=self.excel_to_xml_interface)
+        self.button3.pack(pady=10)
+
+        self.button3 = ttk.Button(self.root, text="(游戏表格)多语言表格导出 Excel转XML", command=self.excel_to_xml_interface_game)
         self.button3.pack(pady=10)
     
     def convert_xml_to_excel_interface(self):
@@ -95,6 +98,39 @@ class ExcelToXmlConverterApp:
 
         # 运行转换按钮
         self.run_button = ttk.Button(self.root, text="开始转换", command=self.run_excel_to_xml_conversion)
+        self.run_button.pack(pady=(20, 10))
+
+        # 返回按钮
+        self.return_button = ttk.Button(self.root, text="返回主菜单", command=self.return_to_menu)
+        self.return_button.pack(pady=(20, 10))
+
+
+    def excel_to_xml_interface_game(self):
+        """Excel转XML界面"""
+        self.clear_root()
+
+        # 输入Excel文件
+        self.input_file_label = ttk.Label(self.root, text="输入Excel文件:")
+        self.input_file_label.pack(pady=(10, 5))
+
+        self.input_file_entry = ttk.Entry(self.root, state="disabled", width=40)
+        self.input_file_entry.pack(pady=5)
+
+        self.choose_file_button = ttk.Button(self.root, text="选择文件", command=lambda: self.choose_file("excel"))
+        self.choose_file_button.pack(pady=(5, 10))
+
+        # 输出文件夹和XML文件
+        self.output_folder_label = ttk.Label(self.root, text="输出文件夹:")
+        self.output_folder_label.pack(pady=(10, 5))
+
+        self.output_folder_entry = ttk.Entry(self.root, state="disabled", width=40)
+        self.output_folder_entry.pack(pady=5)
+
+        self.choose_folder_button = ttk.Button(self.root, text="选择文件夹", command=self.choose_folder)
+        self.choose_folder_button.pack(pady=(5, 10))
+
+        # 运行转换按钮
+        self.run_button = ttk.Button(self.root, text="开始转换", command=self.run_excel_to_xml_conversion_game)
         self.run_button.pack(pady=(20, 10))
 
         # 返回按钮
@@ -171,6 +207,21 @@ class ExcelToXmlConverterApp:
 
         try:
             convert_excel_to_xml(input_file, output_folder)
+            messagebox.showinfo("成功", "转换成功！")
+        except Exception as e:
+            messagebox.showerror("错误", f"发生错误: {str(e)}")
+
+    def run_excel_to_xml_conversion_game(self):
+        """执行Excel转XML转换"""
+        input_file = self.input_file_entry.get()
+        output_folder = self.output_folder_entry.get()
+
+        if not input_file or not output_folder:
+            messagebox.showerror("错误", "请选择输入文件、输出文件夹并提供XML文件名。")
+            return
+
+        try:
+            convert_excel_to_xml_game(input_file, output_folder)
             messagebox.showinfo("成功", "转换成功！")
         except Exception as e:
             messagebox.showerror("错误", f"发生错误: {str(e)}")

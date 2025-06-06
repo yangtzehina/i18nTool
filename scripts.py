@@ -80,6 +80,92 @@ class XMLProcessor:
             raise
     
     @staticmethod
+    def excel_to_xml_game(input_path, output_path):
+        """
+        将Excel文件转换为XML格式，每个条目包含 KEY, ID, Value1, Value2, Tag.
+        输出格式:
+        <root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <data>
+            <Template>
+              <entry>
+                <KEY>key_value_from_excel</KEY>
+                <ID>id_value_from_excel</ID>
+                <Value1>value1_from_excel</Value1>
+                <Value2>value2_from_excel</Value2>
+                <Tag>tag_value_from_excel</Tag>
+              </entry>
+              ...
+            </Template>
+          </data>
+        </root>
+        """
+        try:
+            df = pd.read_excel(input_path)
+
+            required_columns = ["KEY", "ID", "Value1", "Value2", "Tag"]
+            
+            # Validate that the required columns exist
+            for col_name in required_columns:
+                if col_name not in df.columns:
+                    raise ValueError(f"Excel file missing a required column: {col_name}")
+
+            # Create the root element for the XML with xsi namespace
+            NSMAP = {'xsi': "http://www.w3.org/2001/XMLSchema-instance"}
+            root_xml_element = etree.Element("root", nsmap=NSMAP)
+            
+            data_element = etree.SubElement(root_xml_element, "data")
+            template_element = etree.SubElement(data_element, "Template")
+
+            # Iterate through each row in the DataFrame
+            for index, row_data in df.iterrows():
+                entry_element = etree.SubElement(template_element, "entry") # Add entry to Template
+                
+                key_val = row_data.get("KEY", "")
+                id_val = row_data.get("ID", "")
+                value1_val = row_data.get("Value1", "")
+                value2_val = row_data.get("Value2", "")
+                tag_val = row_data.get("Tag", "")
+
+                # Create sub-elements for each required column
+                key_sub_element = etree.SubElement(entry_element, "KEY")
+                key_sub_element.text = str(key_val) if pd.notna(key_val) else ""
+                
+                id_sub_element = etree.SubElement(entry_element, "ID")
+                id_sub_element.text = str(id_val) if pd.notna(id_val) else ""
+                
+                value1_sub_element = etree.SubElement(entry_element, "Value1")
+                value1_sub_element.text = str(value1_val) if pd.notna(value1_val) else ""
+                
+                value2_sub_element = etree.SubElement(entry_element, "Value2")
+                value2_sub_element.text = str(value2_val) if pd.notna(value2_val) else ""
+                
+                tag_sub_element = etree.SubElement(entry_element, "Tag")
+                tag_sub_element.text = str(tag_val) if pd.notna(tag_val) else ""
+
+            # Create an ElementTree object
+            # tree = etree.ElementTree(root_xml_element) # Not strictly needed if passing root_xml_element to save_xml_file
+            
+            # Define the output file name.
+            if os.path.isdir(output_path):
+                output_file_path = os.path.join(output_path, 'strings-zh_tc.xml')
+            else:
+                # Ensure the directory for the output file exists if a full path is given
+                output_dir = os.path.dirname(output_path)
+                if output_dir: # Check if output_dir is not an empty string
+                    os.makedirs(output_dir, exist_ok=True)
+                output_file_path = output_path
+
+            # Save XML file using the existing save_xml_file method for pretty printing and declaration
+            XMLProcessor.save_xml_file(root_xml_element, output_file_path)
+    
+            print(f"游戏 已生成XML文件: {output_file_path}")
+            return True
+        except Exception as e:
+            print(f"Excel转XML (game format) 失败: {str(e)}")
+            raise
+    
+
+    @staticmethod
     def xml_to_excel(input_file, output_file):
         """将XML文件转换为Excel格式"""
         try:
@@ -366,6 +452,10 @@ def convert_xml_to_excel(input_file, dist_file):
 def convert_excel_to_xml(input_file, output_file):
     """将Excel文件转换为XML文件"""
     return XMLProcessor.excel_to_xml(input_file, output_file)
+
+def convert_excel_to_xml_game(input_file, output_file):
+    """将Excel文件转换为游戏特定格式的XML文件"""
+    return XMLProcessor.excel_to_xml_game(input_file, output_file)
 
 def compare_language_excel(input_file, dist_file):
     """比较和更新Excel文件"""
